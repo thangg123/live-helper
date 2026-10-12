@@ -1,0 +1,10 @@
+{
+  "name": "arena-live-helper",
+  "private": true,
+  "description": "Chrome extension tự động thao tác YouTube Studio cho livestream từng bàn — test cho phần logic thuần.",
+  "scripts": {
+    "test": "node --test \"tests/**/*.test.mjs\"",
+    "coverage": "node --test --experimental-test-coverage \"tests/**/*.test.mjs\"",
+    "icons": "node scripts/make-icons.mjs"
+  }
+}

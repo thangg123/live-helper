@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Mock Studio</title>
+<!--
+  Trang giả lập YouTube Studio để chạy thử dom.js + flows.js trong trình duyệt thật.
+  DOM ở đây khớp với selector trong selectors.js (bản đoán) — nó kiểm tra LOGIC luồng, không kiểm tra selector Studio thật.
+  Mở: http://127.0.0.1:8765/tests/harness/mock-studio.html  rồi gọi window.harness.run(...) trong console / Playwright.
+-->
+<style>
+  body { font: 14px system-ui; margin: 20px; }
+  tp-yt-paper-dialog, ytcp-uploads-dialog, ytcp-confirmation-dialog { display: block; position: fixed; inset: 60px 40px auto; background: #fff; border: 1px solid #999; padding: 16px; z-index: 100; }
+  tp-yt-paper-listbox { display: block; position: fixed; top: 120px; left: 60px; background: #fff; border: 1px solid #333; z-index: 200; }
+  tp-yt-paper-item, ytcp-dropdown-trigger, ytls-ingestion-dropdown-trigger-renderer { display: block; padding: 6px; cursor: pointer; }
+  [role="checkbox"], [role="radio"] { display: inline-block; width: 14px; height: 14px; border: 1px solid #333; }
+  [aria-checked="true"] { background: #333; }
+  ytcp-video-row { display: block; padding: 6px; border-bottom: 1px solid #ddd; }
+  #textbox, [contenteditable] { display: block; min-height: 20px; border: 1px solid #aaa; white-space: pre-wrap; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="../../arena-live-helper/shared/text.js"></script>
+<script src="../../arena-live-helper/content/selectors.js"></script>
+<script src="../../arena-live-helper/content/dom.js"></script>
+<script src="../../arena-live-helper/content/inspector.js"></script>
+<script src="../../arena-live-helper/content/flows.js"></script>
+<script src="mock-studio.js"></script>
+</body>
+</html>

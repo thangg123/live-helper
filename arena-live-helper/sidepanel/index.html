@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arena Live Helper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand">
+      <span class="brand-ball" aria-hidden="true"></span>
+      <div class="brand-text"><strong>Arena Live</strong><span>Helper</span></div>
+    </div>
+    <button type="button" class="studio-pill" id="studioPill" data-state="off" title="Trạng thái tab YouTube Studio">
+      <span class="dot" aria-hidden="true"></span><span id="studioPillText">Chưa mở Studio</span>
+    </button>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Chức năng">
+    <button type="button" role="tab" id="tab-control" aria-controls="panel-control" aria-selected="true">Điều khiển</button>
+    <button type="button" role="tab" id="tab-tables" aria-controls="panel-tables" aria-selected="false" tabindex="-1">Cấu hình bàn</button>
+    <button type="button" role="tab" id="tab-selector" aria-controls="panel-selector" aria-selected="false" tabindex="-1">Selector</button>
+  </nav>
+
+  <main>
+    <!-- ── Điều khiển ─────────────────────────────────────────────── -->
+    <section id="panel-control" role="tabpanel" aria-labelledby="tab-control" class="panel">
+      <div class="table-pick">
+        <label for="tableSelect" class="kicker">Bàn</label>
+        <select id="tableSelect"></select>
+        <p class="key-hint" id="keyHint">Stream key: —</p>
+      </div>
+
+      <fieldset class="card">
+        <legend class="card-title">Thông tin trận</legend>
+        <div class="grid2">
+          <label class="field">Giải<input id="m-giai" data-var="giai" autocomplete="off"></label>
+          <label class="field">Vòng<input id="m-vong" data-var="vong" autocomplete="off"></label>
+          <label class="field">VĐV A<input id="m-a" data-var="a" autocomplete="off"></label>
+          <label class="field">VĐV B<input id="m-b" data-var="b" autocomplete="off"></label>
+        </div>
+        <label class="field">Ghi chú<input id="m-ghichu" data-var="ghichu" autocomplete="off"></label>
+      </fieldset>
+
+      <section class="card" aria-labelledby="pvHeading">
+        <header class="card-head">
+          <h2 class="card-title" id="pvHeading">Xem trước</h2>
+          <button type="button" id="btnRegen" class="btn-link" hidden>↺ Lấy lại theo mẫu</button>
+        </header>
+        <label class="field">
+          <span class="field-row"><span>Tiêu đề</span><span id="titleCount" class="count">0/100</span></span>
+          <textarea id="pv-title" class="title-box" rows="2" spellcheck="false"></textarea>
+        </label>
+        <label class="field">Mô tả<textarea id="pv-desc" rows="5"></textarea></label>
+        <ul id="pvErrors" class="errors" aria-live="polite"></ul>
+      </section>
+
+      <section class="card" aria-labelledby="streamsHeading">
+        <header class="card-head">
+          <h2 class="card-title" id="streamsHeading">Luồng hiện có</h2>
+          <button type="button" id="btnRefresh" class="btn-ghost">Làm mới</button>
+        </header>
+        <div id="streamList" class="stream-list" role="radiogroup" aria-label="Chọn luồng">
+          <p class="empty">Bấm “Làm mới” để đọc danh sách từ Studio.</p>
+        </div>
+      </section>
+
+      <section class="actions" aria-label="Thao tác">
+        <button type="button" id="btnSwitch" class="btn-switch">
+          <span class="btn-switch-label">Chuyển trận</span>
+          <span class="btn-switch-sub" id="switchSub">tạo luồng mới → kết thúc luồng cũ</span>
+        </button>
+        <div class="grid2">
+          <button type="button" id="btnCreate" class="btn">Tạo luồng mới</button>
+          <button type="button" id="btnEnd" class="btn btn-danger">Kết thúc luồng đã chọn</button>
+        </div>
+        <button type="button" id="btnEdit" class="btn">Cập nhật tiêu đề / mô tả</button>
+        <div class="action-foot">
+          <label class="toggle">
+            <input type="checkbox" id="dryRun">
+            <span class="toggle-track" aria-hidden="true"></span>
+            <span class="toggle-text"><strong>Chạy thử</strong><small>chỉ tô viền đỏ, không bấm</small></span>
+          </label>
+          <button type="button" id="btnStopInline" class="btn-stop" disabled>■ Dừng</button>
+        </div>
+        <div id="resultBox" class="result" hidden></div>
+      </section>
+
+      <section class="card log-card" aria-labelledby="logHeading">
+        <header class="card-head">
+          <h2 class="card-title" id="logHeading">Nhật ký</h2>
+          <div class="btn-row">
+            <button type="button" id="btnCopyLog" class="btn-ghost">Copy</button>
+            <button type="button" id="btnClearLog" class="btn-ghost">Xoá</button>
+          </div>
+        </header>
+        <ol id="logList" class="log-list" aria-live="polite"></ol>
+      </section>
+    </section>
+
+    <!-- ── Cấu hình bàn ───────────────────────────────────────────── -->
+    <section id="panel-tables" role="tabpanel" aria-labelledby="tab-tables" class="panel" hidden>
+      <section class="card" aria-labelledby="tablesHeading">
+        <header class="card-head">
+          <h2 class="card-title" id="tablesHeading">Danh sách bàn</h2>
+          <button type="button" id="btnAddTable" class="btn-ghost">+ Thêm bàn</button>
+        </header>
+        <ul id="tableList" class="table-list"></ul>
+      </section>
+
+      <form id="tableForm" class="card table-form" hidden novalidate>
+        <header class="card-head"><h2 class="card-title" id="tableFormTitle">Sửa bàn</h2></header>
+        <label class="field">Tên bàn<input name="name" placeholder="Bàn 3" autocomplete="off"></label>
+        <label class="field">
+          <span class="field-row"><span>Tên stream key</span><small>đúng như hiện trong Studio</small></span>
+          <input name="streamKeyName" placeholder="Ban 3 - Arena Q7" autocomplete="off">
+        </label>
+        <label class="field">Mẫu tiêu đề<input name="titleTemplate" data-template autocomplete="off"></label>
+        <label class="field">Mẫu mô tả<textarea name="descriptionTemplate" rows="6" data-template></textarea></label>
+        <div class="var-chips" id="varChips" aria-label="Chèn biến vào mẫu"></div>
+        <div class="grid2">
+          <label class="field">Chế độ hiển thị
+            <select name="visibility">
+              <option value="PUBLIC">Công khai</option>
+              <option value="UNLISTED">Không công khai</option>
+              <option value="PRIVATE">Riêng tư</option>
+            </select>
+          </label>
+          <label class="field">Danh mục<input name="category" placeholder="Thể thao" autocomplete="off"></label>
+        </div>
+        <label class="field">
+          <span class="field-row"><span>Playlist</span><small>để trống nếu không dùng</small></span>
+          <input name="playlist" autocomplete="off">
+        </label>
+        <div class="grid2">
+          <label class="toggle"><input type="checkbox" name="autoStart"><span class="toggle-track" aria-hidden="true"></span><span class="toggle-text"><strong>Tự bắt đầu</strong></span></label>
+          <label class="toggle"><input type="checkbox" name="autoStop"><span class="toggle-track" aria-hidden="true"></span><span class="toggle-text"><strong>Tự kết thúc</strong></span></label>
+        </div>
+        <p class="muted">Dành cho trẻ em: luôn chọn “Không”.</p>
+        <ul id="tableErrors" class="errors" aria-live="polite"></ul>
+        <div class="form-foot">
+          <button type="button" id="btnDeleteTable" class="btn btn-danger">Xoá bàn</button>
+          <div class="btn-row">
+            <button type="button" id="btnCancelTable" class="btn-ghost">Huỷ</button>
+            <button type="submit" class="btn btn-primary">Lưu bàn</button>
+          </div>
+        </div>
+      </form>
+
+      <section class="card" aria-labelledby="settingsHeading">
+        <h2 class="card-title" id="settingsHeading">Cài đặt chung</h2>
+        <label class="field">
+          <span class="field-row"><span>Channel ID</span><small id="detectedChannel"></small></span>
+          <input id="set-channel" placeholder="UC… (để trống = tự nhận từ Studio)" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="field">Thứ tự khi chuyển trận
+          <select id="set-order">
+            <option value="createFirst">Tạo luồng mới trước, rồi kết thúc luồng cũ</option>
+            <option value="endFirst">Kết thúc luồng cũ trước, rồi tạo luồng mới</option>
+          </select>
+        </label>
+        <label class="field">Chờ luồng mới lên live tối đa (giây)<input id="set-timeout" type="number" min="10" max="600" step="5"></label>
+      </section>
+
+      <section class="card" aria-labelledby="backupHeading">
+        <h2 class="card-title" id="backupHeading">Sao lưu cấu hình</h2>
+        <p class="muted">Xuất ra file JSON để chép sang máy khác.</p>
+        <div class="grid2">
+          <button type="button" id="btnExport" class="btn">Xuất file JSON</button>
+          <button type="button" id="btnImport" class="btn">Nhập file JSON</button>
+        </div>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+      </section>
+    </section>
+
+    <!-- ── Selector ───────────────────────────────────────────────── -->
+    <section id="panel-selector" role="tabpanel" aria-labelledby="tab-selector" class="panel" hidden>
+      <section class="card" aria-labelledby="captureHeading">
+        <h2 class="card-title" id="captureHeading">Chụp DOM</h2>
+        <p class="muted">Mở đúng màn hình trên Studio (dialog, menu đang mở), rồi bấm chụp. File <code>.html</code> tải về dùng để viết hoặc sửa selector.</p>
+        <button type="button" id="btnCapture" class="btn btn-primary">Chụp màn hình hiện tại</button>
+        <p id="captureInfo" class="muted mono"></p>
+      </section>
+
+      <section class="card" aria-labelledby="checkHeading">
+        <header class="card-head">
+          <h2 class="card-title" id="checkHeading">Kiểm tra selector</h2>
+          <button type="button" id="btnClearHl" class="btn-ghost">Xoá tô viền</button>
+        </header>
+        <p class="muted">Chạy qua từng selector trong <code>selectors.js</code> trên màn hình hiện tại. Bấm một dòng tìm thấy để tô viền xanh phần tử trên Studio.</p>
+        <button type="button" id="btnCheck" class="btn">Kiểm tra selector</button>
+        <div id="checkSummary" class="check-summary"></div>
+        <div id="checkResults"></div>
+      </section>
+
+      <section class="card" aria-labelledby="probeHeading">
+        <h2 class="card-title" id="probeHeading">Đọc dữ liệu trang</h2>
+        <p class="muted">Thử bộ đọc: danh sách luồng (trang Quản lý) hoặc trạng thái phòng điều khiển. Không bấm gì.</p>
+        <button type="button" id="btnProbe" class="btn">Đọc dữ liệu trang</button>
+        <pre id="probeOut" class="code" hidden></pre>
+      </section>
+    </section>
+  </main>
+
+  <div class="runbar" id="runBar" hidden>
+    <span class="runbar-pulse" aria-hidden="true"></span>
+    <span class="runbar-label" id="runLabel">Đang chạy…</span>
+    <button type="button" id="btnStop" class="btn-stop">■ Dừng</button>
+  </div>
+
+  <dialog id="confirmDialog" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+    <form method="dialog">
+      <p class="kicker" id="confirmKicker"></p>
+      <h2 id="confirmTitle"></h2>
+      <p id="confirmMessage" class="confirm-message"></p>
+      <div class="dialog-actions">
+        <button value="cancel" id="confirmCancel" class="btn-ghost">Huỷ</button>
+        <button value="ok" id="confirmOk" class="btn btn-primary">Đồng ý</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="../shared/text.js"></script>
+  <script src="../shared/template.js"></script>
+  <script src="../shared/config.js"></script>
+  <script type="module" src="panel.js"></script>
+</body>
+</html>
